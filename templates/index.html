@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PhishGuard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1f2937, #111827);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 5px;
+            font-size: 28px;
+        }
+
+        p {
+            margin-bottom: 25px;
+            color: #cbd5e1;
+        }
+
+        textarea {
+            width: 100%;
+            height: 160px;
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            resize: none;
+            font-size: 14px;
+            outline: none;
+        }
+
+        textarea:focus {
+            box-shadow: 0 0 0 2px #3b82f6;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            background: #3b82f6;
+            color: white;
+            transition: 0.3s ease;
+        }
+
+        button:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .safe {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .medium {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+
+        .high {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        ul {
+            text-align: left;
+            margin-top: 15px;
+            padding-left: 20px;
+            color: #e5e7eb;
+        }
+
+        li {
+            margin-bottom: 6px;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>🔐 PhishGuard</h1>
+        <p>AI-Based Phishing Detection Tool</p>
+
+        <form method="POST">
+            <textarea name="message" placeholder="Paste email, URL or message here..." required></textarea>
+            <button type="submit">Analyze Message</button>
+        </form>
+
+        {% if result %}
+            <div class="result 
+                {% if 'HIGH' in result %}high
+                {% elif 'Medium' in result %}medium
+                {% else %}safe
+                {% endif %}">
+                {{ result }}
+            </div>
+
+            {% if reasons %}
+                <h3>Detection Details:</h3>
+                <ul>
+                    {% for reason in reasons %}
+                        <li>{{ reason }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endif %}
+    </div>
+
+</body>
+</html>
