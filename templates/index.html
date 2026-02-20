@@ -3,6 +3,7 @@
 <head>
     <title>PhishGuard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <style>
         * {
             box-sizing: border-box;
@@ -11,28 +12,43 @@
         body {
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1f2937, #111827);
+            background: linear-gradient(-45deg, #1f2937, #111827, #1e3a8a, #0f172a);
+            background-size: 400% 400%;
+            animation: gradientBG 12s ease infinite;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             color: #fff;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .card {
             background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(14px);
             padding: 40px;
             width: 90%;
-            max-width: 600px;
-            border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            max-width: 650px;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
             text-align: center;
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         h1 {
             margin-bottom: 5px;
-            font-size: 28px;
+            font-size: 30px;
+            letter-spacing: 1px;
         }
 
         p {
@@ -44,55 +60,100 @@
             width: 100%;
             height: 160px;
             padding: 15px;
-            border-radius: 10px;
+            border-radius: 12px;
             border: none;
             resize: none;
             font-size: 14px;
             outline: none;
+            transition: 0.3s;
         }
 
         textarea:focus {
             box-shadow: 0 0 0 2px #3b82f6;
+            transform: scale(1.02);
         }
 
         button {
             margin-top: 20px;
             padding: 12px 25px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            background: #3b82f6;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
             color: white;
-            transition: 0.3s ease;
+            transition: all 0.3s ease;
         }
 
         button:hover {
-            background: #2563eb;
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.4);
         }
 
-        .result {
-            margin-top: 25px;
-            padding: 15px;
-            border-radius: 10px;
+        button.loading {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .result-card {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.07);
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
             font-weight: bold;
+            margin-bottom: 15px;
+            animation: pulse 1.5s infinite;
         }
 
-        .safe {
-            background: rgba(34, 197, 94, 0.2);
-            color: #22c55e;
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.4); }
+            70% { box-shadow: 0 0 0 12px rgba(255,255,255,0); }
+            100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
         }
 
-        .medium {
-            background: rgba(251, 191, 36, 0.2);
-            color: #fbbf24;
+        .safe { background: rgba(34,197,94,0.2); color: #22c55e; }
+        .medium { background: rgba(251,191,36,0.2); color: #fbbf24; }
+        .high { background: rgba(239,68,68,0.2); color: #ef4444; }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            overflow: hidden;
+            margin: 15px 0;
         }
 
-        .high {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            width: 0;
+            transition: width 0.8s ease;
+        }
+
+        .progress-safe {
+            width: 25%;
+            background: linear-gradient(90deg, #16a34a, #22c55e);
+        }
+
+        .progress-medium {
+            width: 55%;
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        }
+
+        .progress-high {
+            width: 90%;
+            background: linear-gradient(90deg, #dc2626, #ef4444);
         }
 
         ul {
@@ -104,45 +165,89 @@
 
         li {
             margin-bottom: 6px;
+            opacity: 0;
+            animation: slideIn 0.5s ease forwards;
+        }
+
+        li:nth-child(1) { animation-delay: 0.2s; }
+        li:nth-child(2) { animation-delay: 0.4s; }
+        li:nth-child(3) { animation-delay: 0.6s; }
+        li:nth-child(4) { animation-delay: 0.8s; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         @media (max-width: 600px) {
-            .card {
-                padding: 25px;
-            }
+            .card { padding: 25px; }
         }
     </style>
 </head>
+
 <body>
 
-    <div class="card">
-        <h1>🔐 PhishGuard</h1>
-        <p>AI-Based Phishing Detection Tool</p>
+<div class="card">
+    <h1>🔐 PhishGuard</h1>
+    <p>AI-Based Phishing Detection Tool</p>
 
-        <form method="POST">
-            <textarea name="message" placeholder="Paste email, URL or message here..." required></textarea>
-            <button type="submit">Analyze Message</button>
-        </form>
+    <form method="POST" onsubmit="showLoading(this)">
+        <textarea name="message" placeholder="Paste email, URL or message here..." required></textarea>
+        <button type="submit" id="analyzeBtn">Analyze Message</button>
+    </form>
 
-        {% if result %}
-            <div class="result 
-                {% if 'HIGH' in result %}high
-                {% elif 'Medium' in result %}medium
-                {% else %}safe
+    {% if result %}
+    <div class="result-card">
+
+        <div class="badge 
+            {% if 'HIGH' in result %}high
+            {% elif 'Medium' in result %}medium
+            {% else %}safe
+            {% endif %}">
+            {{ result }}
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill 
+                {% if 'HIGH' in result %}progress-high
+                {% elif 'Medium' in result %}progress-medium
+                {% else %}progress-safe
                 {% endif %}">
-                {{ result }}
             </div>
+        </div>
 
-            {% if reasons %}
-                <h3>Detection Details:</h3>
-                <ul>
-                    {% for reason in reasons %}
-                        <li>{{ reason }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
+        {% if reasons %}
+        <h3>🔍 Detection Details</h3>
+        <ul>
+            {% for reason in reasons %}
+                <li>{{ reason }}</li>
+            {% endfor %}
+        </ul>
         {% endif %}
     </div>
+    {% endif %}
+</div>
+
+<script>
+    // Animate progress bar on load
+    window.addEventListener("load", function () {
+        const fill = document.querySelector(".progress-fill");
+        if (fill) {
+            const targetWidth = getComputedStyle(fill).width;
+            fill.style.width = "0";
+            setTimeout(() => {
+                fill.style.width = targetWidth;
+            }, 100);
+        }
+    });
+
+    // Loading animation on button click
+    function showLoading(form) {
+        const btn = document.getElementById("analyzeBtn");
+        btn.classList.add("loading");
+        btn.innerHTML = "Analyzing...";
+    }
+</script>
 
 </body>
 </html>
