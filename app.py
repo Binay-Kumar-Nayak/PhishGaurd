@@ -2,22 +2,25 @@ from flask import Flask, render_template, request
 import re
 import requests
 from urllib.parse import urlparse
-from collections import Counter
-import pandas as pd
 import os
-# ML Imports
+import csv
+import joblib
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 
 app = Flask(__name__)
 
 # -----------------------------
-# LOAD DATASET
+# LOAD DATASET WITHOUT PANDAS
 # -----------------------------
-# Dataset should have: 'text' (message) and 'label' (0=Safe,1=Phishing)
-data = pd.read_csv("dataset.csv")
-texts = data["text"]
-labels = data["label"]
+texts = []
+labels = []
+
+with open("dataset.csv", "r", encoding="utf-8") as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        texts.append(row["text"])
+        labels.append(int(row["label"]))
 
 # -----------------------------
 # ML MODEL (SENTENCE LEVEL)
@@ -29,18 +32,21 @@ model = LogisticRegression(max_iter=2000, class_weight="balanced")
 model.fit(X, labels)
 
 # -----------------------------
+# OPTIONAL: SAVE MODEL FOR FUTURE USE
+# -----------------------------
+joblib.dump(model, "model.pkl")
+joblib.dump(vectorizer, "vectorizer.pkl")
+
+# -----------------------------
 # DETECTION FUNCTION
 # -----------------------------
 def analyze_message(message):
     score = 0
     reasons = []
-    message_lower = message.lower()
 
-    # -----------------------------
-    # 1️⃣ ML PREDICTION
-    # -----------------------------
+    # ML prediction
     X_new = vectorizer.transform([message])
-    probability = model.predict_proba(X_new)[0][1]  # phishing probability
+    probability = model.predict_proba(X_new)[0][1]
 
     if probability > 0.80:
         score += 3
@@ -52,9 +58,7 @@ def analyze_message(message):
         score += 1
         reasons.append(f"AI Slight Suspicion: {round(probability*100,2)}%")
 
-    # -----------------------------
-    # 2️⃣ URL CHECK (Optional, keeps URL rules)
-    # -----------------------------
+    # URL checks
     urls = re.findall(r'https?://\S+|www\.\S+', message)
     for url in urls:
         parsed = urlparse(url)
