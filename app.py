@@ -10,9 +10,6 @@ from sklearn.linear_model import LogisticRegression
 
 app = Flask(__name__)
 
-# -----------------------------
-# LOAD DATASET WITHOUT PANDAS
-# -----------------------------
 texts = []
 labels = []
 
@@ -34,8 +31,8 @@ model.fit(X, labels)
 # -----------------------------
 # OPTIONAL: SAVE MODEL FOR FUTURE USE
 # -----------------------------
-joblib.dump(model, "model.pkl")
-joblib.dump(vectorizer, "vectorizer.pkl")
+# joblib.dump(model, "model.pkl")
+# joblib.dump(vectorizer, "vectorizer.pkl")
 
 # -----------------------------
 # DETECTION FUNCTION
