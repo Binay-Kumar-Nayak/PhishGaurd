@@ -4,7 +4,7 @@ import requests
 from urllib.parse import urlparse
 from collections import Counter
 import pandas as pd
-
+import os
 # ML Imports
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
@@ -112,4 +112,4 @@ def home():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
